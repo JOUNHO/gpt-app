@@ -45,7 +45,7 @@ app.post('/', async (req, res) => {
 app.post('/setting',async (req, res) => {
     console.log("setting 실행");
     //1.TextLoader
-    const loader = new TextLoader("src/document_loders/test/example.txt");
+    const loader = new TextLoader("src/document_loders/test/chatgpt_welfare_utf8.txt");
     
     const docs = await loader.load();
     //console.log(docs);
@@ -97,7 +97,7 @@ app.post('/question', async (req, res) => {
         question : question,
     });
 
-    //console.log(answer);
+    console.log(answer);
 
     if(answer) {
         res.json({

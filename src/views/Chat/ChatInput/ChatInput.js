@@ -1,18 +1,19 @@
-import { Button, TextField } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
 
 function ChatInput(props) {
-    const {question, setQuestion, setAnswer, setChatList, chatList} = props;
-    const handleChangeQuestion = (e) => {
-        setQuestion(e.target.value);
-    }
-    const  handleOnKeyUp = (e) =>{
-        if(e.key == "Enter") {
-            if (e.nativeEvent.isComposing) return;
-            handleOnQuestion();
-        }
-    }
-    const handleOnQuestion = (e) => {
-        if(question){
+    const {question, setQuestion, setAnswer, setChatList, chatList, setIsSpinner, dialogContentRef} = props;
+    const [defaultChatList,setDefaultChatList] = useState([
+        "근속하면 뭐가 좋아?",
+        "안녕 반가워",
+        "본인이 결혼하면 혜택이 뭐야?"
+    ]);
+    const [isSend,setIsSend] = useState(false);
+
+    useEffect(() => {
+        console.log(dialogContentRef);
+        if(isSend && question) {
+            setIsSpinner(true);
             const newData = {
                 sender : "user",
                 content : question,
@@ -24,11 +25,11 @@ function ChatInput(props) {
             ])});
             setQuestion("");
             fetch('http://localhost:3001/question', {
-              method: 'POST',
-              headers: {
+                method: 'POST',
+                headers: {
                 'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({question})
+                },
+                body: JSON.stringify({question})
             })
             .then((res) => res.json())
             .then((data) => {
@@ -43,13 +44,61 @@ function ChatInput(props) {
                             newData
                     ])
                 })
+                setIsSpinner(false);
+                dialogContentRef.current.scrollTop = dialogContentRef.current.scrollHeight
             })
         }
+        setIsSend(false);
+    },[isSend])
+
+    const handleChangeQuestion = (e) => {
+        setQuestion(e.target.value);
+    }
+    const  handleOnKeyUp = (e) =>{
+        if(e.key == "Enter") {
+            if (e.nativeEvent.isComposing) return;
+            handleOnQuestion();
+        }
+    }
+    const handleOnDefaultQuestion = (e, index, value) => {
+        const question = e.target.innerText;
+        setQuestion(question);
+        setIsSend(true);
+    }
+    const handleOnQuestion = (e) => {
+        setIsSend(true);
     }
     return (
         <>
+            {
+                chatList.length == 0 &&
+                defaultChatList.map((defaultChatItem) => {
+                    return (
+                        <Box
+                            component="span"
+                            sx={{
+                                backgroundColor: '#e9ecef',
+                                fontSize :"13px",
+                                marginLeft:"8px",
+                                marginTop:"5px",
+                                padding:"7px",
+                                borderRadius: 2,
+                                '&:hover': {
+                                backgroundColor: '#ced4da',
+                                opacity: [0.9, 0.8, 0.7],
+                                },
+                                
+                            }}
+                            onClick = {handleOnDefaultQuestion}
+                        >
+                            {defaultChatItem}
+                        </Box>
+                    )
+                })
+            }
+            <Box sx={{display: "flex"}}>
             <TextField 
-                fullWidth label="How do I use a LLM Chain?"  
+                fullWidth label="복리후생 관련해서 물어봐주세요."  
                 id="fullWidth"
                 margin="normal"
                 maxHeight='25px'
@@ -60,9 +109,12 @@ function ChatInput(props) {
                 />
             <Button
                 onClick={handleOnQuestion}
+                sx={{marginLeft : '5px',marginTop:'20px', height:"50px"}}
+                variant="contained"
                 >
-                전송
+                Ask
             </Button>
+            </Box>
         </>
     )
 };
