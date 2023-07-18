@@ -17,6 +17,7 @@ function ChatInput(props) {
             const newData = {
                 sender : "user",
                 content : question,
+                insertTime : new Date().toLocaleString(),
             };
             setChatList((chatList) => {
                 return ([
@@ -37,6 +38,7 @@ function ChatInput(props) {
                 const newData = {
                     sender : "chat",
                     content : data.message.text,
+                    insertTime : new Date().toLocaleString(),
                 }
                 setChatList((chatList) => {
                     return ([

@@ -7,6 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useRef, useState } from 'react';
 import ChatList from './ChatList/ChatList';
 import SendIcon from '@mui/icons-material/Send';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import ChatInput from './ChatInput/ChatInput';
 
 
@@ -40,13 +41,25 @@ function Chat(props) {
         }}
       >
         <DialogTitle id="scroll-dialog-title">
-        <Button sx={{backgroundColor: '#e9ecef', color: '#495057', '&:hover': {
-                                backgroundColor: '#e9ecef',
-                                opacity: [0.9, 0.8, 0.7],
-                                },}} variant="contained" startIcon={<SendIcon />} onClick={handleOnReset}>Reset</Button >
+        <Button sx={{backgroundColor: '#e9ecef', 
+                    color: '#495057',
+                    width: '12px',
+                    height: '30px',
+                    fontSize: '12px',
+                    textTransform:'none',
+                    '&:hover': {
+                      backgroundColor: '#e9ecef',
+                      opacity: [0.9, 0.8, 0.7],
+                      },}} 
+                      variant="contained"
+                      startIcon={<RefreshIcon sx={{marginRight:'-6px', fontSize:'15px'}}/>}
+                      onClick={handleOnReset}
+                      
+                      >Reset</Button >
         </DialogTitle>
         <DialogContent dividers={true}
                        ref={dialogContentRef}
+                       sx={{borderTop:'none'}}
         >
           <DialogContentText
             id="scroll-dialog-description"

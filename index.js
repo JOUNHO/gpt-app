@@ -1,15 +1,14 @@
-import express from 'express';
-import { OpenAI } from "langchain/llms/openai";
-import {TextLoader} from 'langchain/document_loaders/fs/text';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import { ChatOpenAI } from "langchain/chat_models/openai";
-import { getEncoding } from 'js-tiktoken';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import { Document } from 'langchain/document';
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { FaissStore } from "langchain/vectorstores/faiss";
-import { loadQAStuffChain } from "langchain/chains";
+const express = require("express");
+const TextLoader = require("langchain/document_loaders/fs/text").TextLoader;
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const ChatOpenAI = require("langchain/chat_models/openai").ChatOpenAI;
+const getEncoding = require("js-tiktoken").getEncoding;
+const RecursiveCharacterTextSplitter = require("langchain/text_splitter").RecursiveCharacterTextSplitter;
+const Document = require("langchain/document").Document;
+const OpenAIEmbeddings = require("langchain/embeddings/openai").OpenAIEmbeddings;
+const FaissStore = require("langchain/vectorstores/faiss").FaissStore;
+const loadQAStuffChain = require("langchain/chains").loadQAStuffChain;
 
 const app = express();
 const port = 3001;
@@ -86,7 +85,8 @@ app.post('/setting',async (req, res) => {
 
 app.post('/question', async (req, res) => {
     console.log('question 실행');
-    const { question } = req.body;
+    let { question } = req.body;
+    question = "이름은 H-IZI(이지) 현대아이티앤이(현대IT&E) 복리후생 제도 안내 챗봇입니다. 질문에 대한 답변은 반드시 제공한 내용중에서만 검색해서 사용하고, 아래에 내용이 없는 질문에 대해서 모른다고 하면서 담당자에게 문의하라고 답변하세요.\n" + question;
     const similarDocs = await vectorDB.similaritySearch(question);
     console.log(similarDocs);
     //const res = await embeddings.embedQuery();
