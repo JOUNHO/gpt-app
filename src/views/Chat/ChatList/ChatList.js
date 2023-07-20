@@ -9,6 +9,7 @@ function ChatList(props) {
             {chatList.map((chatItem) => {
                 return (
                     <>
+                        <Divider sx={{marginBottom:"15px"}}><Chip sx={{fontSize:"12px"}} label={chatItem.insertTime}></Chip></Divider>
                         <Box sx={{display : 'flex', whiteSpace : 'pre-line',}} 
                         >
                             {chatItem.sender === "user" ? 
@@ -26,7 +27,7 @@ function ChatList(props) {
                             }         
                                 <Typography sx={{fontSize : '15px', fontFamily: "'VT323', monospace", fontWeight:'500', marginLeft:'10px'}}>{chatItem.content}</Typography>
                         </Box>
-                        <Divider sx={{marginTop:"15px"}}><Chip sx={{fontSize:"12px"}} label={chatItem.insertTime}></Chip></Divider>
+                        
                         <br/>
                     </>
                 )

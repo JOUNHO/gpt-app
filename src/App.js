@@ -1,9 +1,9 @@
 import './App.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '@mui/material/Button/index.js';
 import Chat from './views/Chat/Chat.js';
 import Header from './views/Template/Header/index';
-
+import imgA from './img/로그인화면5.jpg';
 
 
 function App() {
@@ -12,8 +12,10 @@ function App() {
   const [answer, setAnswer] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
 
+  // useEffect(() => {
+  //   handleSetting();
+  // },[]);
   const handleSetting = (e) => {
-    e.preventDefault()
     fetch('http://localhost:3001/setting', {
       method: 'POST',
       headers: {
@@ -64,34 +66,16 @@ function App() {
 
    
   return (
-    <div className='App'>
+    <div className='App' style={{width:"100%", height:"100%", position:"fixed"}}>
       <div>
-        <Header setIsChatOpen={setIsChatOpen}></Header>
+        <Header setIsChatOpen={setIsChatOpen} handleSetting={handleSetting}></Header>
       </div>
       <div>
         <Chat isChatOpen={isChatOpen}
               setIsChatOpen={setIsChatOpen}
         ></Chat>
       </div>
-        <Button variant="white" onClick={handleSetting}>setting</Button>
-      <div>
-        <div>{response}</div>
-      {/* <Button variant="contained" onClick={openChatRoom} sx={{m: 4, p: 2}}>Modal
-        <Chat 
-          isChatOpen = {isChatOpen}
-        >
-        </Chat>
-      </Button> */}
-      </div>
-      <div>
-      
-        <div>{answer}</div>
-        <div>
-          {/* <Button onClick={handleSummarization}>
-            handleSummarization
-          </Button> */}
-        </div>
-      </div>
+        <img src={imgA} style={{width:"100%", height:"95%"}}/>
     </div>
   );
 }

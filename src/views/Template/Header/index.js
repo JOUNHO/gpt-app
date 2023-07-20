@@ -8,7 +8,7 @@ import SearchTemplate from "./SearchTemplate";
 
 
 function Header(props) {
-    const { setIsChatOpen } = props;
+    const { setIsChatOpen, handleSetting } = props;
 
   return(
     <Box sx={{ flexGrow: 1 }}>
@@ -20,16 +20,16 @@ function Header(props) {
             color="default"
             aria-label="open drawer"
             sx={{ mr: 2 }}
+            onClick={handleSetting}
           >
             <MenuIcon/>
           </IconButton>
           <Typography
             variant="h6"
-            noWrap
             component="div"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+            sx={{ flexGrow: 1,  }}
           >
-            
+            H-IZI
           </Typography>
             <SearchTemplate setIsChatOpen={setIsChatOpen}/>          
         </Toolbar>
