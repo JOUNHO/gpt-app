@@ -18,7 +18,7 @@ function Chat(props) {
   const [answer, setAnswer] = useState("");
   const [chatList, setChatList] = useState([]);
   const [isSpinner, setIsSpinner] = useState(false);
-
+  
   const  dialogContentRef = useRef();
   
   console.log(question);

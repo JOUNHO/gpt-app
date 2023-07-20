@@ -10,6 +10,8 @@ const OpenAIEmbeddings = require("langchain/embeddings/openai").OpenAIEmbeddings
 const FaissStore = require("langchain/vectorstores/faiss").FaissStore;
 const loadQAStuffChain = require("langchain/chains").loadQAStuffChain;
 
+const PuppeterrWebBaseLoader = require("langchain/document_loaders/web/puppeteer").PuppeteerWebBaseLoader;
+
 const app = express();
 const port = 3001;
 let vectorDB;
@@ -17,7 +19,7 @@ let vectorDB;
 const OPEN_AI_API_KEY = "";
 const openAI = new ChatOpenAI({
     openAIApiKey : OPEN_AI_API_KEY,
-    temperature:0.5,
+    temperature:0,
     modelName :'gpt-3.5-turbo',
 })
 
@@ -43,25 +45,74 @@ app.post('/', async (req, res) => {
 
 app.post('/setting',async (req, res) => {
     console.log("setting 실행");
-    //1.TextLoader
-    const loader = new TextLoader("src/document_loders/test/chatgpt_welfare_utf8.txt");
-    
-    const docs = await loader.load();
-    //console.log(docs);
-    const pageContent = docs[0].pageContent;
-    //2.create count tokens - countTokens();
-   
-    //3.split (청크화)
+
+    const urlList = [
+        "https://uno-gaebal.tistory.com/56",
+        "https://uno-gaebal.tistory.com/57",
+        "https://uno-gaebal.tistory.com/58",
+        "https://uno-gaebal.tistory.com/59",
+        "https://uno-gaebal.tistory.com/60",
+        "https://uno-gaebal.tistory.com/61",
+        "https://uno-gaebal.tistory.com/62",
+    ];
+
+    //3.청크화때 사용
     const splitter = new RecursiveCharacterTextSplitter({
-        chunkSize:512,
-        chunkOverlap:24,
+        chunkSize:1000,
+        chunkOverlap:100,
         //length_function :countTokens,
     })
+    let chunks = [];
 
-    const chunks = await splitter.splitDocuments([
-        new Document({pageContent: pageContent})
-    ]);
-    //console.log(chunks);
+    for(const url of urlList){
+        //1.TextLoader
+        const loader = new PuppeterrWebBaseLoader(url);
+        const docs = await loader.load();
+
+        const pageContent = docs[0].pageContent;
+        const pageMetaData = docs[0].metadata;
+
+        //3.split(청크화)
+        const tempChunks = await splitter.splitDocuments([
+            new Document({
+                pageContent: pageContent,
+                metadata : pageMetaData,
+            })
+        ]);
+        chunks = chunks.concat(tempChunks);
+    }
+    //1.TextLoader
+    // const loader = new PuppeterrWebBaseLoader("https://uno-gaebal.tistory.com/57");
+    // const loader2 = new PuppeterrWebBaseLoader("https://uno-gaebal.tistory.com/56");
+    //const loader = new TextLoader("src/document_loders/test/chatgpt_welfare_utf8.txt");
+    
+    // const docs = await loader.load();
+    // const docs2 = await loader2.load();
+
+    //console.log(docs);
+    // const pageContent = docs[0].pageContent;
+    // const pageMetaData = docs[0].metadata;
+
+    // const pageContent2 = docs2[0].pageContent;
+    // const pageMetaData2 = docs2[0].metadata;
+    //2.create count tokens - countTokens();
+    //console.log(pageMetaData.source);
+    //3.split (청크화)
+    // let chunks = await splitter.splitDocuments([
+    //     new Document({
+    //         pageContent: pageContent,
+    //         metadata : pageMetaData,
+    //     })
+    // ]);
+
+    // const chunks2 = await splitter.splitDocuments([
+    //     new Document({
+    //         pageContent: pageContent2,
+    //         metadata : pageMetaData2,
+    //     })
+    // ]);
+
+    console.log(chunks);
 
     //4.Embedding and vectorStore
 
@@ -77,8 +128,8 @@ app.post('/setting',async (req, res) => {
         embeddings
       );
     //console.log(vectorDB);
-    console.log('vectorDB');
-
+    //console.log('vectorDB');
+    console.log("success");
     (chunks && vectorDB) ? res.json({message:"success"}) : res.json({message:"fail"});
 });
 
@@ -86,7 +137,6 @@ app.post('/setting',async (req, res) => {
 app.post('/question', async (req, res) => {
     console.log('question 실행');
     let { question } = req.body;
-    question = "이름은 H-IZI(이지) 현대아이티앤이(현대IT&E) 복리후생 제도 안내 챗봇입니다. 질문에 대한 답변은 반드시 제공한 내용중에서만 검색해서 사용하고, 아래에 내용이 없는 질문에 대해서 모른다고 하면서 담당자에게 문의하라고 답변하세요.\n" + question;
     const similarDocs = await vectorDB.similaritySearch(question);
     console.log(similarDocs);
     //const res = await embeddings.embedQuery();
@@ -101,7 +151,10 @@ app.post('/question', async (req, res) => {
 
     if(answer) {
         res.json({
-            message: answer
+            message: {
+                answer : answer.text,
+                similarDocs : similarDocs,
+            }
         })
     }
 })

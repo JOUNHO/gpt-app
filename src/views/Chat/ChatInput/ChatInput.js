@@ -18,6 +18,7 @@ function ChatInput(props) {
                 sender : "user",
                 content : question,
                 insertTime : new Date().toLocaleString(),
+                urlList : [],
             };
             setChatList((chatList) => {
                 return ([
@@ -34,11 +35,17 @@ function ChatInput(props) {
             })
             .then((res) => res.json())
             .then((data) => {
-                setAnswer(data.message.text);
+                const {answer,similarDocs} = data.message;
+                setAnswer(answer);
+
+                const allUrlList = similarDocs.map(doc => doc.metadata.source);
+                const urlList =  allUrlList.filter((url,i) => { return (allUrlList.indexOf(url) === i)});
+
                 const newData = {
                     sender : "chat",
-                    content : data.message.text,
+                    content : data.message.answer,
                     insertTime : new Date().toLocaleString(),
+                    urlList : urlList,
                 }
                 setChatList((chatList) => {
                     return ([
